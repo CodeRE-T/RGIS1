@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>WebGIS Grundprodukt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- MapLibre GL CSS -->
+  <link href="https://unpkg.com/maplibre-gl@3.7.0/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    body { margin: 0; }
+    #map { width: 100vw; height: 100vh; }
+    .marker {
+      background: #0078a8;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      border: 2px solid white;
+      box-shadow: 0 0 3px #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <!-- MapLibre GL JS -->
+  <script src="https://unpkg.com/maplibre-gl@3.7.0/dist/maplibre-gl.js"></script>
+  <script>
+    // 1. Karte initialisieren
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: {
+        "version": 8,
+        "sources": {
+          "osm": {
+            "type": "raster",
+            "tiles": [
+              "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            ],
+            "tileSize": 256,
+            "attribution": "© OpenStreetMap"
+          }
+        },
+        "layers": [
+          {
+            "id": "osm-layer",
+            "type": "raster",
+            "source": "osm"
+          }
+        ]
+      },
+      center: [8.5417, 47.3769], // Zürich
+      zoom: 12
+    });
+
+    // 2. Beispiel: POI als Marker einfügen
+    map.on('load', function() {
+      // Beispiel-Daten: Liste von Punkten
+      const pois = [
+        {name: "Zürich HB", coord: [8.5402,47.3782]},
+        {name: "ETH Zürich", coord: [8.5480,47.3763]},
+        {name: "Paradeplatz", coord: [8.5392,47.3715]}
+      ];
+      for (const poi of pois) {
+        // Marker als HTML-Element
+        const el = document.createElement('div');
+        el.className = 'marker';
+        // Popup
+        const popup = new maplibregl.Popup({ offset: 25 }).setText(poi.name);
+        // Marker setzen
+        new maplibregl.Marker(el)
+          .setLngLat(poi.coord)
+          .setPopup(popup)
+          .addTo(map);
+      }
+    });
+
+    // Optional: Navigation Control (Zoom/Rotate)
+    map.addControl(new maplibregl.NavigationControl(), "top-left");
+  </script>
+</body>
+</html>
